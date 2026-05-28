@@ -7,6 +7,13 @@ export const api = axios.create({
   },
 });
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export const setAuthHeader = (userId: string | null) => {
   if (userId) {
     api.defaults.headers.common["x-user-id"] = userId;

@@ -7,82 +7,129 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
 import Pagination from "./Pagination";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getTransactions } from "@/services/transactions.service";
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-];
+interface TransactionsTableProps {
+  userId?: string;
+  status?: string;
+  page: number;
+  onPageChange: (page: number) => void;
+}
 
-function TransactionsTable() {
+const statusMap = {
+  pending: {
+    label: "Pendiente",
+    variant: "outline" as const,
+    className: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+  },
+  confirmed: {
+    label: "Confirmada",
+    variant: "outline" as const,
+    className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  },
+  rejected: {
+    label: "Rechazada",
+    variant: "outline" as const,
+    className: "bg-red-500/10 text-red-500 border-red-500/20",
+  },
+};
+
+function TransactionsTable({
+  userId,
+  status,
+  page,
+  onPageChange,
+}: TransactionsTableProps) {
+  const limit = 10;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["transactions", { userId, status, page, limit }],
+    queryFn: () => getTransactions({ userId, status, page, limit }),
+  });
+
+  const totalPages = data ? Math.ceil(data.total / limit) : 0;
+
   return (
     <Table>
       <TableHeader>
         <TableRow className="text-zinc-50 font-semibold border-b border-zinc-300">
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>Fecha</TableHead>
+          <TableHead>Origen</TableHead>
+          <TableHead>Destino</TableHead>
+          <TableHead>Estado</TableHead>
+          <TableHead className="text-right">Monto</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody className="border-b border-zinc-800">
-        {invoices.map((invoice) => (
-          <TableRow
-            key={invoice.invoice}
-            className="text-zinc-300 border-b border-zinc-700"
-          >
-            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-            <TableCell>{invoice.paymentStatus}</TableCell>
-            <TableCell>{invoice.paymentMethod}</TableCell>
-            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+        {isLoading ? (
+          Array.from({ length: 10 }).map((_, i) => (
+            <TableRow key={i} className="border-b border-zinc-700">
+              <TableCell>
+                <Skeleton className="h-4 w-24 bg-zinc-700" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-32 bg-zinc-700" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-32 bg-zinc-700" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20 bg-zinc-700" />
+              </TableCell>
+              <TableCell className="text-right">
+                <Skeleton className="h-4 w-16 ml-auto bg-zinc-700" />
+              </TableCell>
+            </TableRow>
+          ))
+        ) : data?.data.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center py-8 text-zinc-500">
+              No se encontraron transacciones
+            </TableCell>
           </TableRow>
-        ))}
+        ) : (
+          data?.data.map((transaction) => {
+            const statusConfig = statusMap[transaction.status];
+            return (
+              <TableRow
+                key={transaction.id}
+                className="text-zinc-300 border-b border-zinc-700"
+              >
+                <TableCell className="font-medium">
+                  {format(new Date(transaction.date), "dd/MM/yyyy HH:mm")}
+                </TableCell>
+                <TableCell>{transaction.sender.name}</TableCell>
+                <TableCell>{transaction.receiver.name}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={statusConfig.variant}
+                    className={statusConfig.className}
+                  >
+                    {statusConfig.label}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right font-semibold text-zinc-50">
+                  ${transaction.amount.toLocaleString()}
+                </TableCell>
+              </TableRow>
+            );
+          })
+        )}
       </TableBody>
       <TableFooter className="bg-transparent text-zinc-50">
         <TableRow className="border-none hover:bg-transparent">
-          <TableCell colSpan={4} className="py-4">
+          <TableCell colSpan={5} className="py-4">
             <div className="flex w-full justify-center">
-              <Pagination />
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
             </div>
           </TableCell>
         </TableRow>
