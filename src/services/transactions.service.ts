@@ -39,3 +39,15 @@ export const createTransaction = async (data: {
   const response = await api.post<Transaction>("/transactions", data);
   return response.data;
 };
+
+export const approveTransaction = async (id: string) => {
+  const { data } = await api.patch<Transaction>(`/transactions/${id}/approve`);
+  return data;
+};
+
+export const rejectTransaction = async (data: { id: string; reason: string }) => {
+  const response = await api.patch<Transaction>(`/transactions/${data.id}/reject`, {
+    reason: data.reason,
+  });
+  return response.data;
+};

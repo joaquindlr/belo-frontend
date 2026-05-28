@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import NewTransaction from "./pages/transactions/NewTransaction";
+import Approvals from "./pages/approvals/Approvals";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
 
           <Route
             path="aprobaciones"
-            element={<div>Menu de aprobaciones</div>}
+            element={<Approvals />}
           />
         </Route>
       </Routes>
