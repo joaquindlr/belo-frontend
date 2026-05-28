@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
+import NewTransaction from "./pages/transactions/NewTransaction";
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
 
           <Route
             path="transacciones/nueva"
-            element={<div>Crear transaccion</div>}
+            element={<NewTransaction />}
           />
 
           <Route

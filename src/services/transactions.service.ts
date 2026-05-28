@@ -30,3 +30,12 @@ export const getTransactions = async (params: {
   );
   return data;
 };
+
+export const createTransaction = async (data: {
+  senderId: string;
+  receiverId: string;
+  amount: number;
+}) => {
+  const response = await api.post<Transaction>("/transactions", data);
+  return response.data;
+};
