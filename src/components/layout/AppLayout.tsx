@@ -1,8 +1,11 @@
 import { Outlet } from "react-router-dom";
 import AppSidebar from "./AppSidebar";
 import Header from "./AppHeader";
+import { useTransactionSocket } from "../../hooks/useTransactionSocket";
 
 function AppLayout() {
+  useTransactionSocket();
+  
   return (
     <div className="flex h-screen w-full bg-zinc-100 overflow-hidden font-sans text-zinc-900">
       <AppSidebar />
