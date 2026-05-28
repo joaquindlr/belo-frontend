@@ -9,7 +9,7 @@ const navItems = [
 
 function AppSidebar() {
   return (
-    <aside className="w-64 bg-zinc-950 text-zinc-50">
+    <aside className="w-64 bg-zinc-950 text-zinc-50 border-r border-zinc-800">
       <div className="h-16 flex items-center px-6 border-b border-zinc-800">
         <h1 className="text-xl font-bold tracking-tight">Belo Mini Fintech</h1>
       </div>
