@@ -79,7 +79,7 @@ function NewTransaction() {
       if (error.response?.status === 422) {
         toast.error("Transacción rechazada", {
           description:
-            "El usuario tiene los fondos retenidos por una transaccion pendiente, por lo que no se pudo realizar la transferencia. Por favor, vaya a la pantalla Dashboard para revisar las transacciones pendientes y liberar los fondos.",
+            "Saldo insuficiente en la cuenta o posee fondos retenidos. Verifique las transacciones pendientes y el saldo e intente nuevamente.",
         });
       } else {
         toast.error("Error al procesar", {
